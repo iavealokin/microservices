@@ -1,0 +1,115 @@
+{{define "home"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+    {{template "head"}}
+    </head>
+{{template "body"}}
+<h2 class="header">Ваши счета</h2>
+<div class="container bill">
+    <div class="row">
+            {{range .Bills}}
+            <div class="col">
+        <table class="bill" >
+            <tbody>
+                <tr>
+                    <td rowspan="2" class="borderRight"><img width="120px" src="/public/img/{{.Bank}}.jpg"></td>
+                    <td class="bold">{{.Name}}</td>
+                </tr>
+                <tr>
+                    <td class="gray">Баланс: {{.BalanceRUB}}</td>
+                </tr>
+                <tr>
+                    <td class="borderRight typeBill">{{.BillType}}</td>
+                    <td class="gray">USD: {{.BalanceUSD}}</td>
+                </tr>
+            </tbody>
+           
+        </table>
+    </div>
+    {{end}}
+</div>
+</div>
+<div>
+    
+</div>
+<div class="content">
+    <h2 class="header">Популярные виджеты</h2>
+    <figure class="highcharts-figure" >
+        <div id="container"></div>
+         </figure>
+</div>
+{{template "scripts"}}
+
+<script type="text/javascript">
+ $(document).ready(function(){
+        $('#sidebar li').removeClass('active');
+        $('#home').addClass('active');
+    })
+var bills = []
+var billsDiagram=[]
+var max=0;
+var i=0;
+var percent = 0;
+var totalBalance=0;
+{{range .Bills}}
+bills.push({name:'{{.Name}}', balance: '{{.BalanceRUB}}'})
+totalBalance=totalBalance+parseInt(bills[i].balance)
+i++;
+{{end}}
+console.log(totalBalance)
+for (i=0;i<bills.length;i++){
+percentNew = parseInt(bills[i].balance)/(totalBalance/100)
+if (percentNew>percent){
+max =i;
+percent=percentNew;
+}
+}
+for (i=0;i<bills.length;i++){
+    percent = parseInt(bills[i].balance)/(totalBalance/100)
+    if (i==max){
+        
+billsDiagram.push({name: `${bills[i].name}`, y: parseFloat(percent),sliced: 'true', selected: 'true'})
+    }else{
+        billsDiagram.push({name: `${bills[i].name}`, y: parseFloat(percent)})
+    }
+}
+console.log(billsDiagram)
+Highcharts.chart('container', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Счета в проценте от общего бюджета'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    accessibility: {
+        point: {
+            valueSuffix: '%'
+        }
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: false
+            },
+            showInLegend: true
+        }
+    },
+    series: [{
+        name: 'Счета',
+        colorByPoint: true,
+        data: billsDiagram
+    }]
+});
+    </script>
+{{end}}

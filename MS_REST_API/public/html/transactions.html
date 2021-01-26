@@ -1,0 +1,83 @@
+{{define "transactions"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+    {{template "head"}}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    </head>
+{{template "body"}}
+<h2 class="header">Транзакции</h2>
+<!--Плагин выбора дат - DaterangePicker-->
+Выберите диапазон дат
+<div id="reportrange" >
+    <i class="fa fa-calendar"></i>&nbsp;
+    <span></span> <i class="fa fa-caret-down"></i>
+</div>
+        {{range .Transactions}}
+<div class="row transaction_row column_transaction">
+   <div class="col">
+  
+       {{.Amount}} 
+       <div class="col subcolumn " >
+        {{.Datetime}} 
+       </div>
+   </div>
+   <div class="col column_transaction">
+    {{.Organization}}
+      
+       <div class="col  subcolumn">
+        {{.Reason}}    
+       </div>
+   </div>
+   <div class="col column_transaction">
+       {{.Bill}}
+       <div class="col subcolumn">
+        {{.Direction}}
+       </div>
+   </div>
+</div>
+{{end}}
+
+{{template "scripts"}}
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+ $(document).ready(function(){
+        $('#sidebar li').removeClass('active');
+        $('#transactions').addClass('active');
+    })
+$(function() {
+
+var start = moment().subtract(29, 'days');
+var end = moment();
+
+function cb(start, end) {
+    $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+}
+
+$('#reportrange').daterangepicker({
+    startDate: start,
+    endDate: end,
+    timePicker:true,
+    ranges: {
+       'Сегодня': [moment(), moment()],
+       'Вчера': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+       'Последние 7 дней': [moment().subtract(6, 'days'), moment()],
+       'Последние 30 дней': [moment().subtract(29, 'days'), moment()],
+       'Этот месяц': [moment().startOf('month'), moment().endOf('month')],
+       'Прошлый месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    }
+}, cb);
+$('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+console.log(picker.startDate._d)
+console.log(picker.endDate._d)
+});
+cb(start, end);
+
+});
+    </script>
+{{end}}
