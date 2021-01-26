@@ -38,16 +38,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	/*
-	   Шлём запрос 1, ожидаем получение true в структуру rply
-	   типа MsgReply, определённую в прото-файле как:
-
-	   message MsgReply {
-	   bool sent = 1;
-	   }
-
-	*/
-
 	rply, err := c.SendPass(ctx, &pb.MsgRequest{"first", "test"})
 	if err != nil {
 		log.Println("something went wrong", err)
