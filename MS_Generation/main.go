@@ -167,7 +167,7 @@ func sendUser(user []byte) {
 	log.Println(rply.Sent)
 
 	//Шлём запрос 2, ожидаем false
-	rply, err = c.RetrievePass(ctx, &pb.MsgRequest{JsonUser: ueser})
+	rply, err = c.RetrievePass(ctx, &pb.MsgRequest{Json: user})
 	if err != nil {
 		log.Println("something went wrong", err)
 	}
