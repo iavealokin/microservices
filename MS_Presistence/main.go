@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -44,7 +45,7 @@ message MsgReply {
 */
 func (s *server) SendPass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply, error) {
 
-	//Код писать не будем, просто ответим true на запрос
+	fmt.Println(in)
 
 	return &pb.MsgReply{Sent: true}, nil
 }
