@@ -38,7 +38,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	rply, err := c.SendPass(ctx, &pb.MsgRequest{"first", "test", "test"})
+	rply, err := c.SendPass(ctx, &pb.MsgRequest{"first", "test"})
 	if err != nil {
 		log.Println("something went wrong", err)
 	}
