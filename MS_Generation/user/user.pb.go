@@ -6,12 +6,11 @@ package user
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,8 +25,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgRequest struct {
-	To                   string   `protobuf:"bytes,1,opt,name=to,proto3" json:"to,omitempty"`
-	Code                 string   `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	JsonUser             string   `protobuf:"bytes,1,opt,name=jsonUser,proto3" json:"jsonUser,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -58,16 +56,9 @@ func (m *MsgRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgRequest proto.InternalMessageInfo
 
-func (m *MsgRequest) GetTo() string {
+func (m *MsgRequest) GetJsonUser() string {
 	if m != nil {
-		return m.To
-	}
-	return ""
-}
-
-func (m *MsgRequest) GetCode() string {
-	if m != nil {
-		return m.Code
+		return m.JsonUser
 	}
 	return ""
 }
@@ -119,17 +110,17 @@ func init() {
 func init() { proto.RegisterFile("user.proto", fileDescriptor_116e343673f7ffaf) }
 
 var fileDescriptor_116e343673f7ffaf = []byte{
-	// 154 bytes of a gzipped FileDescriptorProto
+	// 147 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x2d, 0x4e, 0x2d,
-	0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x32, 0xe0, 0xe2, 0xf2, 0x2d, 0x4e, 0x0f, 0x4a, 0x2d,
-	0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0xe2, 0xe3, 0x62, 0x2a, 0xc9, 0x97, 0x60, 0x54, 0x60, 0xd4, 0xe0,
-	0x0c, 0x62, 0x2a, 0xc9, 0x17, 0x12, 0xe2, 0x62, 0x49, 0xce, 0x4f, 0x49, 0x95, 0x60, 0x02, 0x8b,
-	0x80, 0xd9, 0x4a, 0x72, 0x5c, 0x1c, 0x60, 0x1d, 0x05, 0x39, 0x95, 0x20, 0xf9, 0xe2, 0xd4, 0xbc,
-	0x12, 0xb0, 0x0e, 0x8e, 0x20, 0x30, 0xdb, 0x28, 0x82, 0x8b, 0xcd, 0x37, 0x31, 0x33, 0x27, 0xb5,
-	0x48, 0x48, 0x85, 0x8b, 0x23, 0x38, 0x35, 0x2f, 0x25, 0x20, 0xb1, 0xb8, 0x58, 0x88, 0x5b, 0x0f,
-	0x61, 0x8d, 0x14, 0xa7, 0x1e, 0xcc, 0x04, 0x25, 0x06, 0x21, 0x0d, 0x2e, 0x9e, 0xa0, 0xd4, 0x92,
-	0xa2, 0xcc, 0xd4, 0xb2, 0x54, 0xfc, 0x2a, 0x93, 0xd8, 0xc0, 0x4e, 0x36, 0x06, 0x04, 0x00, 0x00,
-	0xff, 0xff, 0xbf, 0x22, 0x98, 0xf2, 0xc0, 0x00, 0x00, 0x00,
+	0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0xd2, 0xe0, 0xe2, 0xf2, 0x2d, 0x4e, 0x0f, 0x4a, 0x2d,
+	0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x92, 0xe2, 0xe2, 0xc8, 0x2a, 0xce, 0xcf, 0x0b, 0x2d, 0x4e, 0x2d,
+	0x92, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x82, 0xf3, 0x95, 0xe4, 0xb8, 0x38, 0xc0, 0x2a, 0x0b,
+	0x72, 0x2a, 0x85, 0x84, 0xb8, 0x58, 0x8a, 0x53, 0xf3, 0x4a, 0xc0, 0x6a, 0x38, 0x82, 0xc0, 0x6c,
+	0xa3, 0x18, 0x2e, 0x2e, 0x90, 0xba, 0xe0, 0xd4, 0xbc, 0x94, 0xd4, 0x22, 0x21, 0x15, 0x2e, 0x0e,
+	0x10, 0x2b, 0x20, 0xb1, 0xb8, 0x58, 0x88, 0x5b, 0x0f, 0x61, 0x85, 0x14, 0xa7, 0x1e, 0xcc, 0x14,
+	0x25, 0x06, 0x21, 0x0d, 0x2e, 0x9e, 0xa0, 0xd4, 0x92, 0xa2, 0xcc, 0xd4, 0xb2, 0x54, 0xfc, 0x2a,
+	0x93, 0xd8, 0xc0, 0xce, 0x35, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x29, 0x83, 0x57, 0x82, 0xbc,
+	0x00, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -140,108 +131,108 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// MailerClient is the client API for Mailer service.
+// UserSenderClient is the client API for UserSender service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MailerClient interface {
+type UserSenderClient interface {
 	SendPass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error)
 	RetrievePass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error)
 }
 
-type mailerClient struct {
+type userSenderClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewMailerClient(cc *grpc.ClientConn) MailerClient {
-	return &mailerClient{cc}
+func NewUserSenderClient(cc *grpc.ClientConn) UserSenderClient {
+	return &userSenderClient{cc}
 }
 
-func (c *mailerClient) SendPass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error) {
+func (c *userSenderClient) SendPass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error) {
 	out := new(MsgReply)
-	err := c.cc.Invoke(ctx, "/Mailer/SendPass", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/UserSender/SendPass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mailerClient) RetrievePass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error) {
+func (c *userSenderClient) RetrievePass(ctx context.Context, in *MsgRequest, opts ...grpc.CallOption) (*MsgReply, error) {
 	out := new(MsgReply)
-	err := c.cc.Invoke(ctx, "/Mailer/RetrievePass", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/UserSender/RetrievePass", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// MailerServer is the server API for Mailer service.
-type MailerServer interface {
+// UserSenderServer is the server API for UserSender service.
+type UserSenderServer interface {
 	SendPass(context.Context, *MsgRequest) (*MsgReply, error)
 	RetrievePass(context.Context, *MsgRequest) (*MsgReply, error)
 }
 
-// UnimplementedMailerServer can be embedded to have forward compatible implementations.
-type UnimplementedMailerServer struct {
+// UnimplementedUserSenderServer can be embedded to have forward compatible implementations.
+type UnimplementedUserSenderServer struct {
 }
 
-func (*UnimplementedMailerServer) SendPass(ctx context.Context, req *MsgRequest) (*MsgReply, error) {
+func (*UnimplementedUserSenderServer) SendPass(ctx context.Context, req *MsgRequest) (*MsgReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPass not implemented")
 }
-func (*UnimplementedMailerServer) RetrievePass(ctx context.Context, req *MsgRequest) (*MsgReply, error) {
+func (*UnimplementedUserSenderServer) RetrievePass(ctx context.Context, req *MsgRequest) (*MsgReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RetrievePass not implemented")
 }
 
-func RegisterMailerServer(s *grpc.Server, srv MailerServer) {
-	s.RegisterService(&_Mailer_serviceDesc, srv)
+func RegisterUserSenderServer(s *grpc.Server, srv UserSenderServer) {
+	s.RegisterService(&_UserSender_serviceDesc, srv)
 }
 
-func _Mailer_SendPass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserSender_SendPass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MailerServer).SendPass(ctx, in)
+		return srv.(UserSenderServer).SendPass(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Mailer/SendPass",
+		FullMethod: "/UserSender/SendPass",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MailerServer).SendPass(ctx, req.(*MsgRequest))
+		return srv.(UserSenderServer).SendPass(ctx, req.(*MsgRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Mailer_RetrievePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserSender_RetrievePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MailerServer).RetrievePass(ctx, in)
+		return srv.(UserSenderServer).RetrievePass(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Mailer/RetrievePass",
+		FullMethod: "/UserSender/RetrievePass",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MailerServer).RetrievePass(ctx, req.(*MsgRequest))
+		return srv.(UserSenderServer).RetrievePass(ctx, req.(*MsgRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Mailer_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "Mailer",
-	HandlerType: (*MailerServer)(nil),
+var _UserSender_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "UserSender",
+	HandlerType: (*UserSenderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "SendPass",
-			Handler:    _Mailer_SendPass_Handler,
+			Handler:    _UserSender_SendPass_Handler,
 		},
 		{
 			MethodName: "RetrievePass",
-			Handler:    _Mailer_RetrievePass_Handler,
+			Handler:    _UserSender_RetrievePass_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

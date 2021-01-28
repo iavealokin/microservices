@@ -2,58 +2,18 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
+	"strings"
 	"time"
 
 	pb "github.com/iavealokin/microservices/MS_Generation/user"
 	"google.golang.org/grpc"
 )
 
-func main() {
-
-	//Открываем соединение, grpc.WithInsecure() означает,
-	//что шифрование не используется
-	conn, err := grpc.Dial("localhost:20100", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-
-	/*
-
-	   Создаём нового клиента, используя соединение conn
-	   Обратим внимание на название клиента и на название сервиса,
-	   которое мы определили в proto-файле:
-
-	   service Mailer {
-	   rpc SendPass(MsgRequest) returns (MsgReply) {}
-	   rpc RetrievePass(MsgRequest) returns (MsgReply) {}
-	   }
-
-	*/
-
-	c := pb.NewMailerClient(conn)
-
-	//Определяем контекст с таймаутом в 1 секунду
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	rply, err := c.SendPass(ctx, &pb.MsgRequest{"first", "test"})
-	if err != nil {
-		log.Println("something went wrong", err)
-	}
-	log.Println(rply.Sent)
-
-	//Шлём запрос 2, ожидаем false
-	rply, err = c.RetrievePass(ctx, &pb.MsgRequest{"second", "test"})
-	if err != nil {
-		log.Println("something went wrong", err)
-	}
-	log.Println(rply.Sent)
-
-}
-
-/*
+//User struct ...
 type User struct {
 	Login    string `json:"login"`
 	Username string `json:"username"`
@@ -77,8 +37,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(NewUser)
-	fmt.Println(string(outUser))
+	sendUser(outUser)
 }
 
 func getUser() User {
@@ -189,4 +148,29 @@ func generatePassword(passwordLength, minSpecialChar, minNum, minUpperCase int) 
 	})
 	return string(inRune)
 }
-*/
+
+func sendUser(user []byte) {
+	conn, err := grpc.Dial("localhost:20100", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	c := pb.UserSender(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	rply, err := c.SendPass(ctx, &pb.MsgRequest{jsonUser: user})
+	if err != nil {
+		log.Println("something went wrong", err)
+	}
+	log.Println(rply.Sent)
+
+	//Шлём запрос 2, ожидаем false
+	rply, err = c.RetrievePass(ctx, &pb.MsgRequest{To: "first", Code: "test"})
+	if err != nil {
+		log.Println("something went wrong", err)
+	}
+	log.Println(rply.Sent)
+
+}

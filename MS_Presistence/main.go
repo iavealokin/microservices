@@ -68,7 +68,7 @@ func main() {
 	rpcserv := grpc.NewServer()
 
 	//Регистрируем связку сервер + listener
-	pb.RegisterUserServer(rpcserv, &server{})
+	pb.RegisterUserSenderServer(rpcserv, &server{})
 	reflection.Register(rpcserv)
 
 	//Запускаемся и ждём RPC-запросы
