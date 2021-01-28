@@ -5,7 +5,6 @@ syntax = "proto3"; //указываем версию protocol buffers - трет
 
 service User {
     rpc SendPass(MsgRequest) returns (MsgReply) {}
-    rpc RetrievePass(MsgRequest) returns (MsgReply) {}
 }
 
 //формат данных для сообщения MsgRequest
