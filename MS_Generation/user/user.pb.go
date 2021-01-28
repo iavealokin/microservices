@@ -26,8 +26,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgRequest struct {
-	To   string `protobuf:"bytes,1,opt,name=to,proto3" json:"to,omitempty"`
-	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	To                   string   `protobuf:"bytes,1,opt,name=to,proto3" json:"to,omitempty"`
+	Code                 string   `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *MsgRequest) Reset()         { *m = MsgRequest{} }
