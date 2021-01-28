@@ -160,14 +160,7 @@ func sendUser(user []byte) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	rply, err := c.SendPass(ctx, &pb.MsgRequest{Json: user})
-	if err != nil {
-		log.Println("something went wrong", err)
-	}
-	log.Println(rply.Sent)
-
-	//Шлём запрос 2, ожидаем false
-	rply, err = c.RetrievePass(ctx, &pb.MsgRequest{Json: user})
+	rply, err := c.SendPass(ctx, &pb.MsgRequest{Message: user})
 	if err != nil {
 		log.Println("something went wrong", err)
 	}

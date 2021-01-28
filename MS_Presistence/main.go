@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -13,11 +14,11 @@ import (
 
 // User struct ...
 type User struct {
-	Login    string
-	Username string
-	Surname  string
-	Birthday string
-	Password string
+	Login    string `json:"login"`
+	Username string `json:"username"`
+	Surname  string `json:"surname"`
+	Birthday string `json:"birthday"`
+	Password string `json:"password"`
 }
 
 //Структура нашего gRPC сервера
@@ -26,51 +27,26 @@ type server struct {
 
 const port = ":20100"
 
-/*
-
-Методы структуры SendPass и RetrievePass принимают контекст и входящее сообщение,
-формат которого мы описали в proto-файле вот так:
-
-message MsgRequest {
-    string to = 1;
-    string code = 2;
-}
-
-Формат ответного сообщения в прото-файле был такой:
-
-message MsgReply {
-    bool sent = 1;
-}
-
-*/
 func (s *server) SendPass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply, error) {
-
-	fmt.Println(in)
+	var user User
+	_ = json.Unmarshal([]byte(in.Message), &user)
+	fmt.Println(user)
 
 	return &pb.MsgReply{Sent: true}, nil
 }
 
-func (s *server) RetrievePass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply, error) {
-
-	//А здесь ответим false
-
-	return &pb.MsgReply{Sent: false}, nil
-}
-
 func main() {
 
-	//Указываем на каком порту будем слушать запросы
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatal("failed to listen", err)
 	}
 	log.Printf("start listening for emails at port %s", port)
 
-	//Создаём новый grpc сервер
 	rpcserv := grpc.NewServer()
 
 	//Регистрируем связку сервер + listener
-	pb.RegisterUserSenderServer(rpcserv, &server{})
+	pb.RegisterUserServer(rpcserv, &server{})
 	reflection.Register(rpcserv)
 
 	//Запускаемся и ждём RPC-запросы
