@@ -13,7 +13,7 @@ service User {
 //второе поле - строка, название code
 
 message MsgRequest {
-    string json = 1;
+    string message = 1;
   
 }
 
