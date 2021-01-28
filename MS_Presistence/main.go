@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// User struct ...
 type User struct {
 	Login    string
 	Username string
