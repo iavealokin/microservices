@@ -86,17 +86,12 @@ func getUser() User {
 		login = login + surname[0:rand.Intn(len(surname))] + name[0:rand.Intn(len(name))]
 	}
 	rand.Seed(time.Now().Unix())
-	minSpecialChar := 1
+	minSpecialChar := 2
 	minNum := 1
 	minUpperCase := 1
-	passwordLength := 8
+	passwordLength := 20
 	password := generatePassword(passwordLength, minSpecialChar, minNum, minUpperCase)
 
-	minSpecialChar = 2
-	minNum = 2
-	minUpperCase = 2
-	passwordLength = 20
-	password = generatePassword(passwordLength, minSpecialChar, minNum, minUpperCase)
 	user := User{
 		login,
 		name,

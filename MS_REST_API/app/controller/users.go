@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"encoding/json"
 	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"path/filepath"
 
@@ -9,6 +12,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 )
+
+var user model.User
 
 //GetUsers from JSON array to indexDynamic.html
 func GetUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -19,7 +24,7 @@ func GetUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 	//указываем путь к файлу с шаблоном
-	main := filepath.Join("public", "html", "index.html")
+	main := filepath.Join("public", "html", "home.html")
 	common := filepath.Join("public", "html", "template.html")
 
 	//создаем html-шаблон
@@ -35,4 +40,68 @@ func GetUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		http.Error(rw, err.Error(), 400)
 		return
 	}
+}
+
+//Init Db fucntion
+func Init() {
+	err := model.InitDB()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+}
+
+//DropUsers API.
+func DropUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.Unmarshal(body, &user)
+	_ = user.ID
+	_, err = model.DropUser(user.ID)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	rw.Write([]byte("User id deleted"))
+}
+
+//AddUsers API.
+func AddUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.Unmarshal(body, &user)
+	_ = user.ID
+	_, err = model.AddUser(&user)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	rw.Write([]byte("User id added"))
+}
+
+//UpdateUsers API.
+func UpdateUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.Unmarshal(body, &user)
+	_ = user.ID
+	_, err = model.UpdateUser(&user)
+	if err != nil {
+		http.Error(rw, err.Error(), 400)
+		return
+	}
+	rw.Write([]byte("User id updated"))
+
 }

@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net"
+
+	_ "github.com/lib/pq"
 
 	pb "github.com/iavealokin/microservices/MS_Generation/user"
 	"google.golang.org/grpc"
@@ -31,7 +34,7 @@ func (s *server) SendPass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply,
 	var user User
 	_ = json.Unmarshal([]byte(in.Message), &user)
 	fmt.Println(user)
-
+	insertToDB(user)
 	return &pb.MsgReply{Sent: true}, nil
 }
 
@@ -54,4 +57,17 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to serve", err)
 	}
+}
+
+func insertToDB(user User) {
+	db, err := sql.Open("postgres", "postgres://remote:Cfyz11005310@localhost/microservices")
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows, err := db.Query(fmt.Sprintf("INSERT INTO users(login,name,surname,birthday,password) values('%s','%s','%s','%s','%s')",
+		user.Login, user.Username, user.Surname, user.Birthday, user.Password))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
 }
