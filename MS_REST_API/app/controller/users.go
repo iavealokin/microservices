@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -104,4 +105,15 @@ func UpdateUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 	rw.Write([]byte("User id updated"))
 
+}
+
+func ChangeDealy(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	var delaymap = make(map[string]int)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = json.Unmarshal(body, &delaymap)
+	fmt.Println(delaymap["delay"])
 }

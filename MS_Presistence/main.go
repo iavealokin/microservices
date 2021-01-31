@@ -6,13 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
-
-	_ "github.com/lib/pq"
+	"os"
 
 	pb "github.com/iavealokin/microservices/MS_Generation/user"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	_ "github.com/lib/pq"
+	"github.com/streadway/amqp"
 )
 
 // User struct ...
@@ -39,24 +37,64 @@ func (s *server) SendPass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply,
 }
 
 func main() {
+	var user User
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
+	handleError(err, "Can't connect to AMQP")
+	defer conn.Close()
 
-	listener, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatal("failed to listen", err)
-	}
-	log.Printf("start listening for emails at port %s", port)
+	amqpChannel, err := conn.Channel()
+	handleError(err, "Can't create a channel")
+	defer amqpChannel.Close()
 
-	rpcserv := grpc.NewServer()
+	queue, err := amqpChannel.QueueDeclare("new", true, false, false, false, nil)
+	handleError(err, "Couldn't declare `new` queue")
+	err = amqpChannel.Qos(1, 0, false)
+	handleError(err, "Couldn't configure QoS")
+	fmt.Println(queue)
+	messageChannel, err := amqpChannel.Consume(
+		queue.Name,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	handleError(err, "Couldn't register consumer")
+	stopChan := make(chan bool)
 
-	//Регистрируем связку сервер + listener
-	pb.RegisterUserServer(rpcserv, &server{})
-	reflection.Register(rpcserv)
+	go func() {
+		log.Printf("Consumer ready, PID:%d", os.Getpid())
+		for d := range messageChannel {
+			log.Printf("Recieved a message: %s", d.Body)
+			userstruct := User{}
+			err := json.Unmarshal(d.Body, &user)
+			insertToDB(user)
+			if err != nil {
+				log.Printf("Error decoding JSON: %s", err)
+			}
+			log.Printf("Result of username %s is password %s", userstruct.Username, userstruct.Password)
+			if err := d.Ack(false); err != nil {
+				log.Printf("error acknowledging message: %s", err)
+			} else {
+				log.Printf("Acnowledged messae")
+			}
+		}
+	}()
+	<-stopChan
+	/*
+		rpcserv := grpc.NewServer()
 
-	//Запускаемся и ждём RPC-запросы
-	err = rpcserv.Serve(listener)
-	if err != nil {
-		log.Fatal("failed to serve", err)
-	}
+		//Регистрируем связку сервер + listener
+		pb.RegisterUserServer(rpcserv, &server{})
+		reflection.Register(rpcserv)
+
+		//Запускаемся и ждём RPC-запросы
+		err = rpcserv.Serve(listener)
+		if err != nil {
+			log.Fatal("failed to serve", err)
+		}
+	*/
 }
 
 func insertToDB(user User) {
@@ -70,4 +108,10 @@ func insertToDB(user User) {
 		log.Fatal(err)
 	}
 	defer rows.Close()
+}
+
+func handleError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
 }

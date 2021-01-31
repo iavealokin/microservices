@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,8 +8,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/iavealokin/microservices/MS_Generation/user"
-	"google.golang.org/grpc"
+	"github.com/streadway/amqp"
 )
 
 //User struct ...
@@ -145,20 +143,48 @@ func generatePassword(passwordLength, minSpecialChar, minNum, minUpperCase int) 
 }
 
 func sendUser(user []byte) {
-	conn, err := grpc.Dial("localhost:20100", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal(err)
-	}
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
+	handleError(err, "Can't connect to AMQP")
 	defer conn.Close()
 
-	c := pb.NewUserClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	amqpChannel, err := conn.Channel()
+	handleError(err, "Can't create a channel")
+	defer amqpChannel.Close()
 
-	rply, err := c.SendPass(ctx, &pb.MsgRequest{Message: user})
+	queue, err := amqpChannel.QueueDeclare("new", true, false, false, false, nil)
+	handleError(err, "Couldn't declare `new` queue")
+	err = amqpChannel.Qos(1, 0, false)
+	handleError(err, "Couldn't configure QoS")
+	fmt.Println(queue)
+	err = amqpChannel.Publish("", queue.Name, false, false, amqp.Publishing{
+		DeliveryMode: amqp.Persistent,
+		ContentType:  "text/plain",
+		Body:         user,
+	})
 	if err != nil {
-		log.Println("something went wrong", err)
+		log.Fatalf("Error publishing message : %s", err)
 	}
-	log.Println(rply.Sent)
+	log.Printf("User:%s", user)
+	/*
+		conn, err := grpc.Dial("localhost:20100", grpc.WithInsecure())
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer conn.Close()
 
+		c := pb.NewUserClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+
+		rply, err := c.SendPass(ctx, &pb.MsgRequest{Message: user})
+		if err != nil {
+			log.Println("something went wrong", err)
+		}
+		log.Println(rply.Sent)
+	*/
+}
+func handleError(err error, msg string) {
+	if err != nil {
+		log.Fatalf("%s: %s", msg, err)
+	}
 }
