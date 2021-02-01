@@ -7,9 +7,8 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/iavealokin/Microservices/MS_REST_API/app/model"
-	"github.com/iavealokin/icroservices/MS_REST_API/app/model"
-	"github.com/iavealokin/icroservices/MS_REST_API/app/store"
+	"github.com/iavealokin/microservices/MS_REST_API/app/model"
+	"github.com/iavealokin/microservices/MS_REST_API/app/store"
 	"github.com/sirupsen/logrus"
 )
 

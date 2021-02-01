@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/BurntSushi/toml"
-	"github.com/iavealokin/Microservices/MS_REST_API/apiserver"
+	"github.com/iavealokin/microservices/MS_REST_API/app/apiserver"
 	"github.com/julienschmidt/httprouter"
 	_ "github.com/lib/pq"
 	"github.com/streadway/amqp"

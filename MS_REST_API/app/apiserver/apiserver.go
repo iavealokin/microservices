@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/iavealokin/Microservices/MS_REST_API/app/apiserver/store/sqlstore"
+	"github.com/iavealokin/microservices/MS_REST_API/app/apiserver/store/sqlstore"
 )
 
 //Start func
