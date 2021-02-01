@@ -3,7 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 
-	"github.com/iavealokin/microservices/app/store"
+	"github.com/iavealokin/microservices/MS_REST_API/app/store"
 	_ "github.com/lib/pq" // ....
 )
 
