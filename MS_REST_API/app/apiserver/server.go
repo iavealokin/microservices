@@ -3,6 +3,7 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -58,10 +59,12 @@ func (s *server) handleUsersCreate() http.HandlerFunc{
 
 	return func(w http.ResponseWriter, r *http.Request){
 		u := &model.User{}
-		if err := json.NewDecoder(r.Body).Decode(u); err!=nil{
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-			return 
+			return
 		}
+		_ = json.Unmarshal(body, &u)
 			if err := s.store.User().Create(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
 				return
@@ -74,11 +77,13 @@ func (s *server) handleUsersCreate() http.HandlerFunc{
 func (s *server) handleUserDrop() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 		u := &model.User{}
-		if err := json.NewDecoder(r.Body).Decode(u); err!=nil{
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-			return 
+			return
 		}
-	
+		_ = json.Unmarshal(body, &u)
+
 			if err := s.store.User().Drop(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
 				return
@@ -90,10 +95,12 @@ func (s *server) handleUserDrop() http.HandlerFunc{
 func (s *server) handleUserUpdate() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 		u := &model.User{}
-		if err := json.NewDecoder(r.Body).Decode(u); err!=nil{
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-			return 
+			return
 		}
+		_ = json.Unmarshal(body, &u)
 	
 			if err := s.store.User().Update(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
@@ -120,13 +127,14 @@ func (s *server) handleGetUsers() http.HandlerFunc{
 func (s *server) handleChangeDelay() http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request){
 		var delaymap = make(map[string]int)
-
-		if err := json.NewDecoder(r.Body).Decode(delaymap); err!=nil{
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
 			s.error(w, r, http.StatusBadRequest, err)
-			return 
+			return
 		}
+		_ = json.Unmarshal(body, &delaymap)
 	
-		conn, err := amqp.Dial(&config.RmqURL)
+		conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
 		handleError(err, "Can't connect to AMQP")
 		defer conn.Close()
 	
