@@ -82,19 +82,6 @@ func main() {
 		}
 	}()
 	<-stopChan
-	/*
-		rpcserv := grpc.NewServer()
-
-		//Регистрируем связку сервер + listener
-		pb.RegisterUserServer(rpcserv, &server{})
-		reflection.Register(rpcserv)
-
-		//Запускаемся и ждём RPC-запросы
-		err = rpcserv.Serve(listener)
-		if err != nil {
-			log.Fatal("failed to serve", err)
-		}
-	*/
 }
 
 func insertToDB(user User) {

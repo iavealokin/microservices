@@ -2,14 +2,13 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
 
-	"github.com/iavealokin/MDSite/app/model"
+	"github.com/iavealokin/Microservices/MS_REST_API/app/model"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -19,7 +18,7 @@ var user model.User
 //GetUsers from JSON array to indexDynamic.html
 func GetUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	//получаем список всех пользователей
-	_, err := model.GetUser()
+	_, err := model.GetUsersList()
 	if err != nil {
 		http.Error(rw, err.Error(), 400)
 		return
@@ -105,15 +104,4 @@ func UpdateUsers(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 	rw.Write([]byte("User id updated"))
 
-}
-
-func ChangeDealy(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	var delaymap = make(map[string]int)
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_ = json.Unmarshal(body, &delaymap)
-	fmt.Println(delaymap["delay"])
 }

@@ -37,8 +37,8 @@ func InitDB() (err error) {
 
 }
 
-//GetUser func ...
-func GetUser() (users []User, err error) {
+//GetUsersList func ...
+func GetUsersList() (users []User, err error) {
 
 	rows, err := db.Query("select id, login,name,surname,birthday from users;")
 	if err != nil {

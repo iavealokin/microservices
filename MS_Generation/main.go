@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
@@ -21,24 +22,74 @@ type User struct {
 }
 
 var (
-	lowerCharSet   = "abcdedfghijklmnopqrst"
-	upperCharSet   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	specialCharSet = "!@#$%&*"
-	numberSet      = "0123456789"
-	allCharSet     = lowerCharSet + upperCharSet + specialCharSet + numberSet
+	lowerCharSet       = "abcdedfghijklmnopqrst"
+	upperCharSet       = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	specialCharSet     = "!@#$%&*"
+	numberSet          = "0123456789"
+	allCharSet         = lowerCharSet + upperCharSet + specialCharSet + numberSet
+	delay          int = 20
 )
 
 func main() {
-	NewUser := getUser()
-	outUser, err := json.Marshal(NewUser)
-	if err != nil {
-		fmt.Println(err)
-		return
+
+	go consumerAmqp()
+
+	for {
+		log.Printf("THe delay in infinity lop as : %d", delay)
+		time.Sleep(time.Duration(delay) * time.Second)
+		go getUser()
 	}
-	sendUser(outUser)
 }
 
-func getUser() User {
+func consumerAmqp() {
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
+	handleError(err, "Can't connect to AMQP")
+	defer conn.Close()
+
+	amqpChannel, err := conn.Channel()
+	handleError(err, "Can't create a channel")
+	defer amqpChannel.Close()
+
+	queue, err := amqpChannel.QueueDeclare("delay", true, false, false, false, nil)
+	handleError(err, "Couldn't declare `new` queue")
+	err = amqpChannel.Qos(1, 0, false)
+	handleError(err, "Couldn't configure QoS")
+	fmt.Println(queue)
+	messageChannel, err := amqpChannel.Consume(
+		queue.Name,
+		"",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	handleError(err, "Couldn't register consumer")
+	stopChan := make(chan bool)
+	var delaymap = make(map[string]int)
+	go func() {
+		log.Printf("Consumer ready, PID:%d", os.Getpid())
+		for d := range messageChannel {
+			log.Printf("Recieved a message: %s", d.Body)
+			err := json.Unmarshal(d.Body, &delaymap)
+			if err != nil {
+				log.Printf("Error decoding JSON: %s", err)
+			}
+			log.Printf("Delay is %d", delaymap["delay"])
+			delay = delaymap["delay"]
+			log.Printf("this is the delay : %d", delay)
+			if err := d.Ack(false); err != nil {
+				log.Printf("error acknowledging message: %s", err)
+			} else {
+				log.Printf("Acnowledged message")
+			}
+		}
+
+	}()
+	<-stopChan
+}
+func getUser() {
+	fmt.Println("getUser() is started")
 	var usernames = map[int]string{
 		0:  "John",
 		1:  "David",
@@ -97,7 +148,11 @@ func getUser() User {
 		birthday,
 		password,
 	}
-	return user
+	outUser, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println(err)
+	}
+	sendUser(outUser)
 }
 
 func randate() time.Time {
@@ -165,23 +220,7 @@ func sendUser(user []byte) {
 		log.Fatalf("Error publishing message : %s", err)
 	}
 	log.Printf("User:%s", user)
-	/*
-		conn, err := grpc.Dial("localhost:20100", grpc.WithInsecure())
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer conn.Close()
 
-		c := pb.NewUserClient(conn)
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-
-		rply, err := c.SendPass(ctx, &pb.MsgRequest{Message: user})
-		if err != nil {
-			log.Println("something went wrong", err)
-		}
-		log.Println(rply.Sent)
-	*/
 }
 func handleError(err error, msg string) {
 	if err != nil {
