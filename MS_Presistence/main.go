@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
-	pb "github.com/iavealokin/microservices/MS_Generation/user"
 	_ "github.com/lib/pq"
 	"github.com/streadway/amqp"
 )
@@ -26,19 +24,9 @@ type User struct {
 type server struct {
 }
 
-const port = ":20100"
-
-func (s *server) SendPass(ctx context.Context, in *pb.MsgRequest) (*pb.MsgReply, error) {
-	var user User
-	_ = json.Unmarshal([]byte(in.Message), &user)
-	fmt.Println(user)
-	insertToDB(user)
-	return &pb.MsgReply{Sent: true}, nil
-}
-
 func main() {
 	var user User
-	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@0.0.0.0:5672")
 	handleError(err, "Can't connect to AMQP")
 	defer conn.Close()
 
@@ -85,7 +73,7 @@ func main() {
 }
 
 func insertToDB(user User) {
-	db, err := sql.Open("postgres", "postgres://remote:Cfyz11005310@localhost/microservices")
+	db, err := sql.Open("postgres", "postgres://remote:Cfyz11005310@0.0.0.0/microservices")
 	if err != nil {
 		log.Fatal(err)
 	}

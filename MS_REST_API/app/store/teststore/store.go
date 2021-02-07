@@ -1,8 +1,8 @@
 package teststore
 
 import (
-	"github.com/iavealokin/MoneyDrive/internal/app/model"
-	"github.com/iavealokin/MoneyDrive/internal/app/store"
+	"github.com/iavealokin/microservices/MS_REST_API/app/model"
+	"github.com/iavealokin/microservices/MS_REST_API/app/store"
 )
 
 //Store ..

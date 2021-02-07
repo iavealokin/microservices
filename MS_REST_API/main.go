@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"sync"
 
 	"github.com/BurntSushi/toml"
 	"github.com/iavealokin/microservices/MS_REST_API/app/apiserver"
@@ -22,9 +24,25 @@ func main() {
 	if err!= nil{
 		log.Fatal(err)
 	}
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+	go func(){
 	if err := apiserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("ApiServer started")
+wg.Done()
+}()
+	go func(){
+	
+	if err := apiserver.StartWeb(config); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("WebServer started")
+	wg.Done()
+}()
+	wg.Wait()
+
 }
 
 

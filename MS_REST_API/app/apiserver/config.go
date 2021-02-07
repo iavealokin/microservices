@@ -7,11 +7,13 @@ type Config struct {
 	DatabaseURL string `toml:"database_url"`
 	RmqURL	 	string `toml:"rmq_url"`
 	QueueName	string `toml:"rmq_queue"`
+	BindWebAddr string `toml:"bind_web_addr"`
 }
 //NewConfig ...
 func NewConfig() *Config {
 	return &Config{
 		BindAddr: ":8082",
 		LogLevel: "debug",
+		BindWebAddr: ":8081",
 	}
 }

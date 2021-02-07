@@ -1,16 +1,43 @@
 package sqlstore
 
 import (
+	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/iavealokin/microservices/MS_REST_API/app/model"
 )
 
+//UserRepository struct
 type UserRepository struct {
 	store *Store
 }
+//UserLogin ...
+func (r *UserRepository) UserLogin(login string, password string) (error){
+	var errorDrop error
+	sqlStatement := `
+	select count(*) cnt from users
+	WHERE login = $1 and password=$2`
+var cnt int
+	rows, err := r.store.db.Query(sqlStatement, login, password)
+		if err != nil {
+			panic(err)
+		}
+defer rows.Close()
+for rows.Next(){
+	err:=rows.Scan(&cnt)
+	if err !=nil{
+		log.Fatal(err)
+	}
+}
+		if cnt == 0 {
+			errorDrop = errors.New("Incorrect login or password")
+			
+		}
+		return errorDrop
+
+}
+
 //Create user... 
 func (r *UserRepository) Create(u *model.User) (error) {
 	return r.store.db.QueryRow(
@@ -48,21 +75,41 @@ WHERE id = $1;`
 	return errorDrop
 	}
 
+	//UserLogin...
+
+
 //Update user ...
 func (r *UserRepository) Update(u *model.User) (error){
 	var errorDrop error
-	sqlStatement := `
-	UPDATE users
-	SET login = $1,
-	name = $2,
-	surname = $3,
-	birthday = $4,
-	password = $5
-	where id = $6;`
-		res, err := r.store.db.Exec(sqlStatement, u.Login, u.Username, u.Surname, u.Birthday, u.Password, u.ID)
-		if err != nil {
-			panic(err)
-		}
+	var err error
+	var res sql.Result
+	if u.Password==""{
+		sqlStatement := `
+		UPDATE users
+		SET login = $1,
+		name = $2,
+		surname = $3,
+		birthday = $4
+		where id = $5;`
+			res, err = r.store.db.Exec(sqlStatement, u.Login, u.Username, u.Surname, u.Birthday, u.ID)
+			if err != nil {
+				panic(err)
+			}
+	}else{
+		sqlStatement := `
+		UPDATE users
+		SET login = $1,
+		name = $2,
+		surname = $3,
+		birthday = $4,
+		password = $5
+		where id = $6;`
+			res, err = r.store.db.Exec(sqlStatement, u.Login, u.Username, u.Surname, u.Birthday, u.Password, u.ID)
+			if err != nil {
+				panic(err)
+			}
+	}
+	
 		count, err := res.RowsAffected()
 		if err != nil {
 			panic(err)
@@ -75,7 +122,7 @@ func (r *UserRepository) Update(u *model.User) (error){
 	//Get users list
 	func (r *UserRepository) Get() ([] model.User, error){
 		
-		sqlStatement := `select id,login,name,surname,birthday from users;`
+		sqlStatement := `select id,login,name,surname, TO_CHAR(TO_DATE(birthday,'DD.MM.YYYY'),'DD.MM.YYYY') from users;`
 		var users [] model.User
 		rows,err := r.store.db.Query(sqlStatement)
 			if err != nil {
@@ -94,10 +141,11 @@ func (r *UserRepository) Update(u *model.User) (error){
 			if err = rows.Err(); err != nil {
 				log.Fatal(err)
 			}
+			/*
 			for _, usr := range users {
-				fmt.Printf("%s, %s, %s, %s,%s", fmt.Sprint(usr.ID), usr.Login, usr.Username, usr.Surname, usr.Birthday)
-				fmt.Println("")
-			}
+			//	fmt.Printf("%s, %s, %s, %s,%s", fmt.Sprint(usr.ID), usr.Login, usr.Username, usr.Surname, usr.Birthday)
+			//	fmt.Println("")
+			}*/
 		
 			return users, err
 		}

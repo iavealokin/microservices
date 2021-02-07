@@ -1,115 +1,223 @@
-{{define "home"}}
+{{define "users"}}
 <!DOCTYPE html>
 <html>
 
 <head>
+    <link rel="stylesheet" href="/public/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/styles/loginPage.css">
+    <link rel="stylesheet" href="/public/styles/footable.bootstrap.css">
+    
+    <link rel="stylesheet" href="/public/styles/font-awesome.min.css">
+    <link rel="stylesheet" href="/public/styles/docs.css">
+    <link rel="stylesheet" href="/public/styles/prism.css">
     <title>Home</title>
-    {{template "head"}}
-    </head>
-{{template "body"}}
-<h2 class="header">Ваши счета</h2>
-<div class="container bill">
+ </head>
+
+<h2 class="header">Admin panel</h2>
+<div class="container">
     <div class="row">
-            {{range .Bills}}
-            <div class="col">
-        <table class="bill" >
-            <tbody>
-                <tr>
-                    <td rowspan="2" class="borderRight"><img width="120px" src="/public/img/{{.Bank}}.jpg"></td>
-                    <td class="bold">{{.Name}}</td>
-                </tr>
-                <tr>
-                    <td class="gray">Баланс: {{.BalanceRUB}}</td>
-                </tr>
-                <tr>
-                    <td class="borderRight typeBill">{{.BillType}}</td>
-                    <td class="gray">USD: {{.BalanceUSD}}</td>
-                </tr>
-            </tbody>
-           
-        </table>
-    </div>
-    {{end}}
+
+
+
+        <div class="">
+			<table id="editing-example" class="table" data-paging="true" data-filtering="true" data-sorting="true">
+				<thead>
+				<tr>
+					<th data-name="id" data-breakpoints="xs" data-type="number">ID</th>
+					<th data-name="Login">Login</th>
+					<th data-name="FirstName">First Name</th>
+					<th data-name="LastName" data-breakpoints="xs">Last Name</th>
+					<th data-name="Birthday" data-breakpoints="xs sm">Birth Date</th>
+				</tr>
+				</thead>
+				<tbody>
+                    {{range .}}
+                    <tr id='tr{{.ID}}'>
+                        {{if gt .ID 1}}
+                        <td >{{.ID}}</td>
+                        <td name='Login'>{{.Login}}</td>
+                        <td name='Username'>{{.Username}}</td>
+                        <td name ='Surname'>{{.Surname}}</td>
+                        <td name ='Birthday'>{{.Birthday}}</td>
+                        {{end}}
+                    </tr>
+            {{end}}  
+				</tbody>
+			</table>
+
+			<!-- Modal -->
+			<div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+				<style scoped>
+					/* provides a red astrix to denote required fields */
+					.form-group.required .control-label:after {
+						content:"*";
+						color:red;
+						margin-left: 4px;
+					}
+				</style>
+				<div class="modal-dialog" role="document">
+					<form class="modal-content form-horizontal" id="editor">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title" id="editor-title">Add Row</h4>
+						</div>
+						<div class="modal-body">
+							<input type="number" id="id" name="id" class="hidden" style="display:none;"/>
+							<div class="form-group required">
+								<label for="Login" class="col-sm-3 control-label">Login</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="Login" name="Login" placeholder="Login" required>
+								</div>
+                            </div>
+                        <div class="form-group required">
+								<label for="FirstName" class="col-sm-3 control-label">First Name</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="FirstName" name="FirstName" placeholder="First Name" required>
+								</div>
+							</div>
+							<div class="form-group required">
+								<label for="LastName" class="col-sm-3 control-label">Last Name</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="LastName" name="LastName" placeholder="Last Name">
+								</div>
+							</div>
+							<div class="form-group required">
+								<label for="Birthday" class="col-sm-3 control-label">Birth Date</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="Birthday" name="Birthday" placeholder="Birth Date" required>
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-primary">Save changes</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
 </div>
 </div>
 <div>
     
 </div>
-<div class="content">
-    <h2 class="header">Популярные виджеты</h2>
-    <figure class="highcharts-figure" >
-        <div id="container"></div>
-         </figure>
-</div>
-{{template "scripts"}}
+<script src="/public/scripts/jquery-3.5.1.min.js"></script>
+<script src="/public/scripts/popper.min.js"></script>
+<script src="/public/scripts/bootstrap.min.js" ></script>
+<script src="/public/scripts/moment.js" ></script>
+<script src="/public/scripts/footable.js" ></script>
+<script>
+	jQuery(function($){
+		var $modal = $('#editor-modal'),
+			$editor = $('#editor'),
+			$editorTitle = $('#editor-title'),
+			ft = FooTable.init('#editing-example', {
+				editing: {
+					enabled: true,
+					addRow: function(){
+						$modal.removeData('row');
+						$editor[0].reset();
+						$editorTitle.text('Add a new row');
+						$modal.modal('show');
+					},
+					editRow: function(row){
+						var values = row.val();
+						$editor.find('#id').val(values.id);
+						$editor.find('#Login').val(values.Login);
+						$editor.find('#FirstName').val(values.FirstName);
+						$editor.find('#LastName').val(values.LastName);
+						$editor.find('#Birthday').val(values.Birthday);
+						$modal.data('row', row);
+						$editorTitle.text('Edit row #' + values.id);
+						$modal.modal('show');
+					},
+					deleteRow: function(row){
+						if (confirm('Are you sure you want to delete the row?')){
+                           id = row.$el[0].getAttribute('id');
+                           id = id.substring(2,id.length);
+                           dropUser(id)
+                            row.delete();
+                           
+						}
+					}
+				}
+			}),
+			uid = 10;
 
-<script type="text/javascript">
- $(document).ready(function(){
-        $('#sidebar li').removeClass('active');
-        $('#home').addClass('active');
-    })
-var bills = []
-var billsDiagram=[]
-var max=0;
-var i=0;
-var percent = 0;
-var totalBalance=0;
-{{range .Bills}}
-bills.push({name:'{{.Name}}', balance: '{{.BalanceRUB}}'})
-totalBalance=totalBalance+parseInt(bills[i].balance)
-i++;
-{{end}}
-console.log(totalBalance)
-for (i=0;i<bills.length;i++){
-percentNew = parseInt(bills[i].balance)/(totalBalance/100)
-if (percentNew>percent){
-max =i;
-percent=percentNew;
-}
-}
-for (i=0;i<bills.length;i++){
-    percent = parseInt(bills[i].balance)/(totalBalance/100)
-    if (i==max){
-        
-billsDiagram.push({name: `${bills[i].name}`, y: parseFloat(percent),sliced: 'true', selected: 'true'})
-    }else{
-        billsDiagram.push({name: `${bills[i].name}`, y: parseFloat(percent)})
+		$editor.on('submit', function(e){
+			if (this.checkValidity && !this.checkValidity()) return;
+			e.preventDefault();
+			var row = $modal.data('row'),
+				values = {
+					id: $editor.find('#id').val(),
+					Login: $editor.find('#Login').val(),
+					FirstName: $editor.find('#FirstName').val(),
+					LastName: $editor.find('#LastName').val(),
+                    Birthday: $editor.find('#Birthday').val(),
+                };
+                if (values.id==""){
+                    addUser(values);
+                }else{
+                    updateUser(values);
+                }
+                
+			if (row instanceof FooTable.Row){
+				row.val(values);
+			} else {
+				values.id = uid++;
+				ft.rows.add(values);
+			}
+			$modal.modal('hide');
+        });
+    
+    });
+    
+    function dropUser(id){
+        id= {userid:parseInt(id),}
+        id = JSON.stringify(id);
+        console.log(`delete User in id ${id}`);
+        sendQuery(id,"dropUser");
     }
-}
-console.log(billsDiagram)
-Highcharts.chart('container', {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie'
-    },
-    title: {
-        text: 'Счета в проценте от общего бюджета'
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    accessibility: {
-        point: {
-            valueSuffix: '%'
-        }
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: false
-            },
-            showInLegend: true
-        }
-    },
-    series: [{
-        name: 'Счета',
-        colorByPoint: true,
-        data: billsDiagram
-    }]
+
+    function updateUser(user){
+        user = {
+        userid: parseInt(user.id),
+        login:user.Login,
+        username: user.FirstName,
+        surname:user.LastName,
+        birthday:user.Birthday,
+        password:"",
+    }
+        user = JSON.stringify(user);
+
+        console.log(`Update User: ${user}`);
+        sendQuery(user,"updateUser");
+    }
+    function addUser(user){
+        user = {
+        login:user.Login,
+        username: user.FirstName,
+        surname:user.LastName,
+        birthday:user.Birthday,
+        password:"",
+    }
+        user = JSON.stringify(user);
+        console.log(`Add User: ${user}`);
+        sendQuery(user,"addUser");
+    }
+    function sendQuery(json, action){
+        l = window.location.href
+        l= `${l.substring(0,l.length-6)}2`
+        url = `${l}/${action}`
+        $.ajax({
+  type: 'POST',
+  url: url,
+  data: json,
+  dataType: "json",
+  crossDomain:true
 });
-    </script>
+    }
+</script>
+
 {{end}}

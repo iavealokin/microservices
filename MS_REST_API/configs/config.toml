@@ -1,4 +1,5 @@
 bind_addr = ":8082"
+bind_web_addr = ":8081"
 log_level = "debug"
 database_url = "host=localhost user=remote password=Cfyz11005310 dbname=microservices sslmode=disable"
 rmq_url = "amqp://remote:Cfyz11005310@localhost:5672"

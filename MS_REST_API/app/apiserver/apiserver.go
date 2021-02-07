@@ -16,9 +16,20 @@ if err != nil{
 	defer db.Close()
 	store := sqlstore.New(db)
 	srv := newServer(store)
-
 	return http.ListenAndServe(config.BindAddr,srv)
+
 }
+//StartWeb ... 
+func StartWeb(config *Config) error {
+	db,err := newDB(config.DatabaseURL)
+	if err != nil{
+		return err
+	}
+		defer db.Close()
+		store := sqlstore.New(db)
+		websrv := newWebServer(store)
+		return http.ListenAndServe(config.BindWebAddr,websrv)
+	}
 
 
 func newDB(databaseURL string) (*sql.DB,error){

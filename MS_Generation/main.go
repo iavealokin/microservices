@@ -27,7 +27,7 @@ var (
 	specialCharSet     = "!@#$%&*"
 	numberSet          = "0123456789"
 	allCharSet         = lowerCharSet + upperCharSet + specialCharSet + numberSet
-	delay          int = 20
+	delay          int = 100
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 }
 
 func consumerAmqp() {
-	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@127.0.0.1:5672")
 	handleError(err, "Can't connect to AMQP")
 	defer conn.Close()
 

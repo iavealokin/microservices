@@ -1,0 +1,16 @@
+ms_generation:
+  container_name: ms_generation
+  image: microservices:ms_generation
+ms_presistence:
+  container_name: ms_presistence
+  image: microservices:ms_presistence
+db:
+  container_name: psql
+  image: postgres
+  ports:
+  - "5432:5432"
+mq:
+  container_name: rabbitmq
+  image: rabbitmq
+  ports:
+  - "5672:5672"

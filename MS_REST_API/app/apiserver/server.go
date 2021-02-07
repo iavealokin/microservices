@@ -3,6 +3,7 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,8 +22,6 @@ errIncorrectEmailOrPassword = errors.New("Incorrect email or password")
 errUnathorized = errors.New("Unathorized")
 )
 
-type ctxKey int8
-
 
 type server struct {
 	router 		 *mux.Router
@@ -37,6 +36,7 @@ s :=&server{
 	logger: 	  logrus.New(),
 	store: 		  store,
 }
+s.router.StrictSlash(true)
 s.configureRouter()
 return s
 }
@@ -54,7 +54,6 @@ func (s *server) configureRouter(){
 	s.router.HandleFunc("/users", s.handleGetUsers()).Methods("GET")
 }
 
-
 func (s *server) handleUsersCreate() http.HandlerFunc{
 
 	return func(w http.ResponseWriter, r *http.Request){
@@ -64,11 +63,28 @@ func (s *server) handleUsersCreate() http.HandlerFunc{
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		_ = json.Unmarshal(body, &u)
+		err = json.Unmarshal(body, &u)
+fmt.Println(u)
+		if err!=nil{
+			s.error(w,r, http.StatusBadRequest,err)
+		}
+		err = validateStruct(u,"create")
+		if err!=nil{
+			s.error(w,r,http.StatusBadRequest,err)
+			return
+		}
+		if u.Login=="admin"{
+				s.error(w,r, http.StatusForbidden, err)
+				return
+		}else{
 			if err := s.store.User().Create(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
 				return
-			}
+
+			
+		}
+	}
+			
 			s.respond(w, r, http.StatusCreated, u)
 	}
 }
@@ -83,7 +99,7 @@ func (s *server) handleUserDrop() http.HandlerFunc{
 			return
 		}
 		_ = json.Unmarshal(body, &u)
-
+		fmt.Println(u)
 			if err := s.store.User().Drop(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
 				return
@@ -101,11 +117,18 @@ func (s *server) handleUserUpdate() http.HandlerFunc{
 			return
 		}
 		_ = json.Unmarshal(body, &u)
-	
+		err = validateStruct(u,"update")
+		fmt.Println(u)
+		if err!=nil{
+				s.error(w,r,http.StatusBadRequest,err)
+			return
+		}
 			if err := s.store.User().Update(u); err != nil{
 				s.error(w, r, http.StatusUnprocessableEntity, err)
+				fmt.Println(err)
 				return
 			}
+		
 			s.respond(w, r, http.StatusCreated, u)
 	}	
 }
@@ -180,4 +203,32 @@ func handleError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
 	}
+}
+
+
+func validateStruct(u *model.User, handler string) error{
+switch(handler){
+case "create":
+	if u.Birthday!=""||u.Login!=""||u.Username!=""||u.Surname!=""{
+		if len(u.Login)<3{
+			return errors.New("Length of login less than 3 symbols")
+		}
+	}else{
+		return errors.New("Required fields is empty!")
+	}
+	break
+case "update":
+	if u.Birthday!=""||u.Login!=""||u.Username!=""||u.Surname!=""||u.ID!=0{
+		if len(u.Login)<3{
+			return errors.New("Length of login less than 3 symbols")
+		}
+		
+	}else{
+		return errors.New("Required fields is empty!")
+	}
+	break
+case "drop":
+	break
+}
+return nil
 }
