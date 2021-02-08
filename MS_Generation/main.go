@@ -42,7 +42,7 @@ func main() {
 }
 
 func consumerAmqp() {
-	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@127.0.0.1:5672")
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@mq")
 	handleError(err, "Can't connect to AMQP")
 	defer conn.Close()
 

@@ -1,16 +1,42 @@
-ms_generation:
-  container_name: ms_generation
-  image: microservices:ms_generation
-ms_presistence:
-  container_name: ms_presistence
-  image: microservices:ms_presistence
-db:
-  container_name: psql
-  image: postgres
-  ports:
-  - "5432:5432"
-mq:
-  container_name: rabbitmq
-  image: rabbitmq
-  ports:
-  - "5672:5672"
+version: '3'
+services:
+  db:
+    image: microservices:postgres
+    ports:
+      - "5433:5432"
+    expose:
+      - "5432"
+  mq:
+    image: microservices:rmq
+    ports:
+      - "5673:5672"
+    expose:
+      - "5672"
+  ms_generation:
+    image: microservices:ms_generation
+    depends_on: 
+      - mq
+    links:
+      - mq
+  ms_presistence:
+    image: microservices:ms_presistence
+    depends_on: 
+      - db
+      - mq
+    links: 
+      - db
+      - mq
+  ms_rest_api:
+    image: microservices:ms_rest_api
+    depends_on: 
+      - db
+      - mq
+    links: 
+      - db
+      - mq
+    expose:
+      - "8081"
+      - "8082"
+    ports:
+      - "8080:8081"
+      - "8083:8082"

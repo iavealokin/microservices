@@ -26,7 +26,7 @@ type server struct {
 
 func main() {
 	var user User
-	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@0.0.0.0:5672")
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@mq")
 	handleError(err, "Can't connect to AMQP")
 	defer conn.Close()
 
