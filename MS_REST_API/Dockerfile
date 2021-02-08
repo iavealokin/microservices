@@ -13,4 +13,5 @@ COPY . .
 #get dependancies
 RUN    go get 
 RUN    go build 
-CMD ["./main"]
+RUN chmod ugo+x entrypoint.sh
+CMD ["./entrypoint.sh"]

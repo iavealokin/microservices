@@ -1,4 +1,4 @@
-FROM rabbitmq:latest
+FROM rabbitmq:3-management
 ENV RABBITMQ_USER remote
 ENV RABBITMQ_PASSWORD Cfyz11005310
 ENV RABBITMQ_PID_FILE /var/lib/rabbitmq/mnesia/rabbitmq

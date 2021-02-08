@@ -6,8 +6,6 @@ type UserRepository interface {
 	Create(*model.User) error
 	Drop(*model.User) error
 	Update(*model.User) error
-	Get() ([] model.User, error)
-	UserLogin(string, string)  error
-	/*FindByEmail(string) (*model.User, error)
-	FindById(int) (*model.User, error)*/
+	Get() ([]model.User, error)
+	UserLogin(string, string) error
 }

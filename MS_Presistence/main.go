@@ -73,7 +73,8 @@ func main() {
 }
 
 func insertToDB(user User) {
-	db, err := sql.Open("postgres", "postgres://remote:Cfyz11005310@0.0.0.0/microservices")
+	databaseURL := "host=db user=remote password=Cfyz11005310 dbname=microservices sslmode=disable"
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}

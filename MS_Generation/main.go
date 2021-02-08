@@ -27,7 +27,7 @@ var (
 	specialCharSet     = "!@#$%&*"
 	numberSet          = "0123456789"
 	allCharSet         = lowerCharSet + upperCharSet + specialCharSet + numberSet
-	delay          int = 100
+	delay          int = 10
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	go consumerAmqp()
 
 	for {
-		log.Printf("THe delay in infinity lop as : %d", delay)
+		log.Printf("The delay in infinity lop as : %d", delay)
 		time.Sleep(time.Duration(delay) * time.Second)
 		go getUser()
 	}
@@ -43,7 +43,7 @@ func main() {
 
 func consumerAmqp() {
 	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@mq")
-	handleError(err, "Can't connect to AMQP")
+	handleError(err, "Can't connect to AMQP as a consumer")
 	defer conn.Close()
 
 	amqpChannel, err := conn.Channel()
@@ -198,13 +198,13 @@ func generatePassword(passwordLength, minSpecialChar, minNum, minUpperCase int) 
 }
 
 func sendUser(user []byte) {
-	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@localhost:5672")
-	handleError(err, "Can't connect to AMQP")
-	defer conn.Close()
+	conn, err := amqp.Dial("amqp://remote:Cfyz11005310@mq")
+	handleError(err, "Can't connect to AMQ as a sender!")
+	//defer conn.Close()
 
 	amqpChannel, err := conn.Channel()
 	handleError(err, "Can't create a channel")
-	defer amqpChannel.Close()
+	//defer amqpChannel.Close()
 
 	queue, err := amqpChannel.QueueDeclare("new", true, false, false, false, nil)
 	handleError(err, "Couldn't declare `new` queue")
